@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رێبوارێ زانینێ - چالاکیێن زانستی</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rudaw&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121828;
+            --primary-dark: #1B233F;
+            --secondary-dark: #2A3459;
+            --accent-gold: #D4AF37;
+            --text-light: #E0E0E0;
+            --text-muted: #A0A0E0;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107; /* Rengê bo çaverêbûnê */
+            --font-body: 'Rudaw', sans-serif;
+            --font-arabic: 'Amiri', serif;
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-dark); color: var(--text-light); line-height: 1.8; overflow-x: hidden; }
+        .sidebar { width: 120px; background-color: var(--primary-dark); padding: 25px 15px; height: 100vh; position: fixed; top: 0; right: 0; border-left: 2px solid var(--secondary-dark); transition: transform 0.3s ease-in-out; z-index: 1000; }
+        .sidebar.closed { transform: translateX(120px); }
+        .sidebar-header { text-align: center; margin-bottom: 40px; }
+        .sidebar-header h1 { color: var(--accent-gold); font-size: 1.8rem; }
+        .sidebar nav ul { list-style: none; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .sidebar nav li a { display: flex; align-items: center; justify-content: center; color: var(--text-light); text-decoration: none; border-radius: 50%; font-size: 2.5rem; transition: background-color 0.3s, color 0.3s; width: 70px; height: 70px; }
+        .sidebar nav li a .nav-text { display: none; }
+        .sidebar nav li a:hover, .sidebar nav li a.active { background-color: var(--accent-gold); color: var(--primary-dark); font-weight: bold; }
+        .main-content { margin-right: 120px; width: calc(100% - 120px); padding: 30px; transition: margin-right 0.3s ease-in-out; }
+        .page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .page.active { display: block; }
+        .page-title { font-size: 2.5rem; color: var(--accent-gold); margin-bottom: 25px; border-bottom: 2px solid var(--secondary-dark); padding-bottom: 15px; display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; background: none; border: none; color: var(--accent-gold); font-size: 2rem; cursor: pointer; }
+        .card { background-color: var(--primary-dark); padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); border: 1px solid var(--secondary-dark); margin-bottom: 25px; }
+        .card-title { font-size: 1.7rem; color: var(--accent-gold); margin-bottom: 20px; border-bottom: 1px solid var(--secondary-dark); padding-bottom: 10px;}
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 8px; color: var(--text-muted); }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; background-color: var(--bg-dark); border: 1px solid var(--secondary-dark); border-radius: 8px; color: var(--text-light); font-family: var(--font-body); font-size: 1rem; }
+        .input-group textarea { resize: vertical; min-height: 100px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-block { display: block; width: 100%; }
+        .btn-gold { background-color: var(--accent-gold); color: var(--primary-dark); }
+        .btn-gold:hover { background-color: #eec44d; transform: translateY(-2px); }
+        .btn-danger { background-color: var(--danger); color: var(--text-light); }
+        .btn-danger:hover { background-color: #c82333; }
+        .archive-group-title { color: var(--accent-gold); font-size: 1.2rem; margin-top: 30px; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid var(--secondary-dark); }
+        .activity-card { background-color: var(--secondary-dark); padding: 20px; border-radius: var(--border-radius); margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; border-left: 4px solid var(--accent-gold); }
+        .activity-card.pending { border-left-color: var(--warning); }
+        .activity-card.rejected { border-left-color: var(--danger); }
+        .activity-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .activity-card-header .title { font-size: 1.3rem; font-weight: bold; }
+        .activity-card-header .date { font-size: 0.9rem; color: var(--text-muted); }
+        .activity-status-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; color: white; }
+        .status-pending { background-color: var(--warning); color: var(--primary-dark); }
+        .status-approved { background-color: var(--success); }
+        .status-rejected { background-color: var(--danger); }
+        .activity-card-details { border-top: 1px solid #3c4672; padding-top: 15px; }
+        .activity-card-details p { margin-bottom: 8px; font-size: 0.95rem; word-break: break-word; }
+        .activity-card-details strong { color: var(--text-muted); min-width: 120px; display: inline-block;}
+        .activity-attachment img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
+        .activity-attachment a { display: inline-block; padding: 8px 15px; background-color: var(--primary-dark); color: var(--accent-gold); text-decoration: none; border-radius: 6px; margin-top: 10px; }
+        .activity-attachment a:hover { background-color: #121828; }
+        .remove-activity-btn { background: none; border: none; color: var(--danger); font-size: 1.5rem; cursor: pointer; padding: 0 5px; opacity: 0.7; transition: opacity 0.3s; }
+        .remove-activity-btn:hover { opacity: 1; }
+        .total-points-display { text-align: center; margin-bottom: 20px; }
+        .total-points-display .value { font-size: 3rem; color: var(--accent-gold); font-weight: bold; }
+        .total-points-display .label { font-size: 1.2rem; color: var(--text-muted); }
+        #profile-page-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .profile-picture-container { position: relative; cursor: pointer; }
+        #profile-picture { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--accent-gold); object-fit: cover; background-color: var(--secondary-dark); }
+        .profile-picture-container .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; opacity: 0; transition: opacity 0.3s; font-size: 1rem; }
+        .profile-picture-container:hover .overlay { opacity: 1; }
+        #profile-picture-input { display: none; }
+        #profile-info-display h3 { font-size: 1.8rem; color: var(--text-light); }
+        #profile-info-display p { color: var(--text-muted); }
+        #profile-form-container { width: 100%; max-width: 500px; margin-top: 20px; }
+        .leaderboard-list { list-style: none; padding: 0; }
+        .leaderboard-item { display: flex; align-items: center; padding: 15px; margin-bottom: 10px; background-color: var(--secondary-dark); border-radius: var(--border-radius); border-right: 5px solid transparent; transition: transform 0.2s; }
+        .leaderboard-item:hover { transform: scale(1.02); }
+        .leaderboard-item:nth-child(1) { border-color: #FFD700; } .leaderboard-item:nth-child(2) { border-color: #C0C0C0; } .leaderboard-item:nth-child(3) { border-color: #CD7F32; }
+        .leaderboard-rank { font-size: 1.5rem; font-weight: bold; color: var(--accent-gold); min-width: 50px; text-align: center; }
+        .leaderboard-pic { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-left: 15px; background-color: var(--primary-dark); }
+        .leaderboard-name { font-size: 1.2rem; flex-grow: 1; }
+        .leaderboard-points { font-size: 1.5rem; font-weight: bold; color: var(--text-light); }
+        #auth-container { max-width: 400px; margin: 50px auto; padding: 20px; }
+        .auth-form { display: none; } .auth-form.active { display: block; }
+        .auth-toggle-link { color: var(--accent-gold); text-decoration: underline; cursor: pointer; margin-top: 15px; text-align: center; display: block; }
+        .loader { text-align: center; padding: 50px; font-size: 1.5rem; color: var(--accent-gold); }
+        #app-container { display: none; } /* Hidden by default */
+        .status-message { text-align: center; padding: 10px; margin-bottom: 15px; border-radius: 8px; display: none; }
+        .status-message.success { background-color: var(--success); color: white; }
+        .status-message.error { background-color: var(--danger); color: white; }
+        .app-footer { text-align: center; padding: 20px; margin-top: 40px; color: var(--text-muted); font-size: 0.9rem; }
+        .app-footer a { color: var(--accent-gold); text-decoration: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(120px); z-index: 2000; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; width: 100%; }
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="card">
+            <h1 style="text-align: center; color: var(--accent-gold); margin-bottom: 20px;">رێبوارێ زانینێ</h1>
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <h3 class="card-title">چونا ژۆرڤە</h3>
+                <div id="login-status" class="status-message"></div>
+                <div class="input-group">
+                    <label for="login-email">ئیمێل</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">ژمارا نهێنی</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-gold btn-block">چونا ژۆرڤە</button>
+          <p style="text-align: center; margin-top: 15px;">
+    ئەگەر تە هژمار نەبیتن پەیوەندیێ ب فێ ژمارێ بکە لسەر واتسئاپی
+    <br>
+    <a href="https://wa.me/9647517959116" target="_blank" style="color: var(--accent-gold); text-decoration: underline; cursor: pointer;">
+        ٠٧٥١ ٧٩٥ ٩١١٦
+    </a>
+</p>
+            </form>
+
+            <!-- Signup Form (Hidden) -->
+            <form id="signup-form" class="auth-form" style="display: none;">
+                <h3 class="card-title">دروستکرنا هەژمارا نوو</h3>
+                 <div id="signup-status" class="status-message"></div>
+                <div class="input-group">
+                    <label for="signup-fullname">ناڤێ سێ قولی</label>
+                    <input type="text" id="signup-fullname" required>
+                </div>
+                <div class="input-group">
+                    <label for="signup-email">ئیمێل</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">ژمارا نهێنی</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <button type="submit" class="btn btn-gold btn-block">تۆمارکرن</button>
+                <p class="auth-toggle-link" data-form="login">ژ بەری نوکە هەژمارا تە هەیە؟ بچە ژۆرڤە</p>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h1>رێبوارێ زانینێ</h1></div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" data-page="activities-page" title="چالاکیێن زانستی">📝</a></li>
+                    <li><a href="#" class="nav-link" data-page="leaderboard-page" title="پێشبرکێ">🏆</a></li>
+                    <li><a href="#" class="nav-link" data-page="profile-page" title="پروفایل">👤</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2 class="page-title">
+                <button class="menu-toggle" id="menu-toggle-btn">☰</button>
+                <span id="page-title-text"></span>
+            </h2>
+
+            <!-- Activities Page -->
+            <div id="activities-page" class="page">
+                <div class="card">
+                    <h3 class="card-title">تۆمارکرنا چالاکیەکا نوو</h3>
+                    <div id="activity-status" class="status-message"></div>
+                    <div class="input-group">
+                        <label for="activity-type">جورێ چالاکیێ</label>
+                        <select id="activity-type">
+                             <option value="" disabled selected>جورێ چالاکیێ هەلبژێرە...</option>
+                             <option value="نڤێسینا مفایێن بابەتان">✍️ نڤێسینا مفایێن بابەتان</option>
+                             <option value="پوختەکرنا بابەتا وپەرتوکان">📚 پوختەکرنا بابەتان و پەرتوکان</option>
+                             <option value="تفریغ،نڤێسینا شروڤەکرنا مامۆستایان">🎧 نڤێسینا شروڤەکرنا مامۆستایان (تفریغ)</option>
+                             <option value="چێکرنا نەخشێ هزری">🧠 چێکرنا نەخشێ هزری (تشجیر)</option>
+                             <option value="نڤێسینا ڕاپورتان ودارشتن ومەقالان">📄 نڤێسینا ڕاپۆرتان و مقالەیێن علمی</option>
+                             <option value="نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ">📖 نڤێسینا پەیڤ و ڕامانێن قورئانێ</option>
+                             <option value="گوتنا بابەتان یان وانەکێ">🎤 گوتنا بابەتەکێ یان وانەیەکێ</option>
+                             <option value="وەرگێڕانا پەرتوکان">🌐 وەرگێڕانا پەرتوکان</option>
+                             <option value="مڕاجعە ودووبارەکرنا بابەتان">👥 دووبارەکرنا بابەتان دگەل قوتابیێن دی</option>
+                             <option value="بەریکانێن زانستی وژبەرکرنا مەتنان">🏆 بەشداریکرن د بەریکانێن زانستی دا</option>
+                             <option value="کاروچاڵاکیێن ژدەرڤە">🕌 کار و چالاکیێن ژدەرڤە</option>
+                             <option value="کارێن ئەلکترونی">💻 کارێن ئەلکترۆنی (دیزاین، مۆنتاژ...)</option>
+                             <option value="دیارکرنا ژێدەرێن بابەتێ">🔎 دیارکرنا ژێدەرێن بابەتان</option>
+                             <option value="بوارێ ڕەوشتی وئادابا">❤️ گرنگیدان ب بوارێ ڕەوشت و ئادابان</option>
+                        </select>
+                    </div>
+                    <div id="dynamic-fields-container"></div>
+                    <button id="add-activity-btn" class="btn btn-gold btn-block">هنارتن بۆ پەسەندکرنێ</button>
+                </div>
+                
+                <!-- Pending Activities Section -->
+                <div class="card">
+                    <h3 class="card-title">چالاکیێن چاوەڕوانکری</h3>
+                    <div id="pending-activities-container"><div class="loader">چالاکیێن چاوەڕوانکری دهێنە بارکرن...</div></div>
+                </div>
+
+                <!-- Approved Activities (Archive) -->
+                <div class="card">
+                    <h3 class="card-title">ئەرشیفێ چالاکیێن پەسەندکری و کۆما خالان</h3>
+                    <div class="total-points-display">
+                        <div id="total-activity-points" class="value">0</div>
+                        <div class="label">کۆما گشتی یا خالان</div>
+                    </div>
+                    <div id="activities-archive"><div class="loader">چالاکی دهێنە بارکرن...</div></div>
+                </div>
+            </div>
+            
+            <!-- Leaderboard Page -->
+            <div id="leaderboard-page" class="page">
+                <div class="card">
+                    <h3 class="card-title">لیستا پێشبرکێ (Top 10)</h3>
+                    <ul class="leaderboard-list" id="leaderboard-list"><div class="loader">لیست دهێتە بارکرن...</div></ul>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page">
+                <div class="card">
+                    <div id="profile-page-container">
+                        <div class="profile-picture-container" id="profile-picture-wrapper">
+                            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Wêneya Profîlê" id="profile-picture">
+                            <input type="file" id="profile-picture-input" accept="image/*">
+                            <div class="overlay">گوهۆڕینا وێنەی</div>
+                        </div>
+                        <div id="profile-info-display" style="text-align: center;">
+                            <h3 id="display-full-name"></h3>
+                            <p id="display-email"></p>
+                        </div>
+                        <div id="profile-form-container">
+                            <h3 class="card-title">دەستکاریکرنا زانیاریان</h3>
+                            <div id="profile-status" class="status-message"></div>
+                            <form id="profile-form">
+                                <div class="input-group">
+                                    <label for="full-name">ناڤێ سێ قولی</label>
+                                    <input type="text" id="full-name" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="phone-number">ژمارا موبایلێ</label>
+                                    <input type="tel" id="phone-number">
+                                </div>
+                                <button type="submit" class="btn btn-gold btn-block">پاشکەفتکرنا گوهرینان</button>
+                            </form>
+                            <button id="logout-btn" class="btn btn-danger btn-block" style="margin-top: 15px;">دەرکەتن</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <p>ئەڤ بەرهەمە ژ لایێ پرۆژێ ئیسلام ڤە هاتیە دروستکرن</p>
+                <a href="https://t.me/your_telegram_channel" target="_blank">کەناڵێ مە ل تێلێگرامی</a>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs8Oj5Lxgi8R6qt3ZGkZqG9_9phqemQos",
+  authDomain: "kurdish-c8391.firebaseapp.com",
+  projectId: "kurdish-c8391",
+  storageBucket: "kurdish-c8391.firebasestorage.app",
+  messagingSenderId: "349871473333",
+  appId: "1:349871473333:web:6c9cbf5ec692c20000b4fc"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let activitiesListener = null;
+
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const authToggleLinks = document.querySelectorAll('.auth-toggle-link');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        const showStatusMessage = (elementId, message, isError = false) => {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = message;
+            el.className = `status-message ${isError ? 'error' : 'success'}`;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        };
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginForm['login-email'].value;
+            const password = loginForm['login-password'].value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => showStatusMessage('login-status', `شاشی: ${error.message}`, true));
+        });
+
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fullName = signupForm['signup-fullname'].value;
+            const email = signupForm['signup-email'].value;
+            const password = signupForm['signup-password'].value;
+
+            if (fullName.trim() === '') {
+                 showStatusMessage('signup-status', 'تکایە ناڤێ خۆ بنڤیسە.', true);
+                 return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    return db.collection('users').doc(user.uid).set({
+                        fullName: fullName,
+                        email: email,
+                        phone: '',
+                        profilePictureURL: null,
+                        points: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .catch(error => showStatusMessage('signup-status', `شاشی: ${error.message}`, true));
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            if (activitiesListener) {
+                activitiesListener(); 
+                activitiesListener = null;
+            }
+            auth.signOut();
+        });
+
+        authToggleLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetFormId = e.target.dataset.form;
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(`${targetFormId}-form`).classList.add('active');
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'block';
+                initializeApp(user);
+            } else {
+                currentUser = null;
+                authContainer.style.display = 'block';
+                appContainer.style.display = 'none';
+                if (activitiesListener) {
+                    activitiesListener();
+                    activitiesListener = null;
+                }
+            }
+        });
+
+        function initializeApp(user) {
+            setupNavigation();
+            renderProfile(user.uid); 
+            setupActivitiesListener(user.uid);
+            
+            const userDocRef = db.collection('users').doc(user.uid);
+            userDocRef.get().then(doc => {
+                if (doc.exists && (!doc.data().phone || doc.data().phone.trim() === '')) {
+                    showPage('profile-page');
+                    showStatusMessage('profile-status', 'تکایە زانیاریێن پرۆفایلێ خۆ تەمام بکە، ب تایبەت ژمارا موبایلێ.', false);
+                } else {
+                    showPage('activities-page');
+                }
+            }).catch(err => {
+                console.error("Error checking user profile:", err);
+                showPage('activities-page');
+            });
+        }
+
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(e.currentTarget.dataset.page);
+            }));
+            document.getElementById('menu-toggle-btn').addEventListener('click', () => {
+                document.querySelector('.sidebar').classList.toggle('open');
+            });
+        }
+        
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId)?.classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active');
+                if (l.dataset.page === pageId) {
+                    l.classList.add('active');
+                    document.getElementById('page-title-text').textContent = l.getAttribute('title') || '';
+                }
+            });
+            document.querySelector('.sidebar').classList.remove('open');
+            
+            if (pageId === 'leaderboard-page') {
+                renderLeaderboard();
+            }
+        }
+        
+        const profileForm = document.getElementById('profile-form');
+        const fullNameInput = document.getElementById('full-name');
+        const phoneInput = document.getElementById('phone-number');
+        const profilePicImg = document.getElementById('profile-picture');
+        const profilePicInput = document.getElementById('profile-picture-input');
+        const profilePicWrapper = document.getElementById('profile-picture-wrapper');
+        const displayFullName = document.getElementById('display-full-name');
+        const displayEmail = document.getElementById('display-email');
+        
+        async function renderProfile(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const profile = userDoc.data();
+                    fullNameInput.value = profile.fullName || '';
+                    phoneInput.value = profile.phone || '';
+                    displayFullName.textContent = profile.fullName || 'بێ ناڤ';
+                    displayEmail.textContent = profile.email || 'بێ ئیمێل';
+                    profilePicImg.src = profile.profilePictureURL || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                }
+            } catch(error) {
+                console.error("Error fetching profile:", error);
+                showStatusMessage('profile-status', 'شاشیەک د ئینانا پرۆفایلێ دا ڕوویدا', true);
+            }
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+            const updatedProfile = {
+                fullName: fullNameInput.value,
+                phone: phoneInput.value
+            };
+            try {
+                await db.collection('users').doc(currentUser.uid).set(updatedProfile, { merge: true });
+                showStatusMessage('profile-status', 'زانیاری ب سەرکەفتیانە هاتنە پاشکەفتکرن.');
+                renderProfile(currentUser.uid);
+            } catch (error) {
+                showStatusMessage('profile-status', `شاشی: ${error.message}`, true);
+            }
+        });
+
+        profilePicWrapper.addEventListener('click', () => profilePicInput.click());
+        profilePicInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+            
+            if (file.size > 2 * 1024 * 1024) { // 2 MB limit
+                showStatusMessage('profile-status', 'فایلێ بلندکری گەلەک مەزنە. تکایە فایلەکێ بچووکتر ژ 2MB بلندکە.', true);
+                return;
+            }
+
+            showStatusMessage('profile-status', 'وێنە دهێتە بلندکرن...');
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const base64String = reader.result;
+                try {
+                    await db.collection('users').doc(currentUser.uid).set({ profilePictureURL: base64String }, { merge: true });
+                    showStatusMessage('profile-status', 'وێنە ب سەرکەفتیانە هاتە بلندکرن.');
+                    renderProfile(currentUser.uid);
+                } catch (error) {
+                    showStatusMessage('profile-status', `شاشی: ${error.message}`, true);
+                }
+            };
+            reader.onerror = () => {
+                 showStatusMessage('profile-status', 'شاشیەک د خواندنا وێنەی دا ڕوویدا.', true);
+            }
+            reader.readAsDataURL(file);
+        });
+
+        const activityTypeSelect = document.getElementById('activity-type');
+        const dynamicFieldsContainer = document.getElementById('dynamic-fields-container');
+        const addActivityBtn = document.getElementById('add-activity-btn');
+        const activitiesArchive = document.getElementById('activities-archive');
+        const pendingContainer = document.getElementById('pending-activities-container');
+        const totalPointsDisplay = document.getElementById('total-activity-points');
+        
+        const fileInputHTML = `<div class="input-group"><label for="activity-file">بلندکرنا فایلەکێ (وێنە، PDF...)</label><input type="file" id="activity-file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx"></div>`;
+        const activityFields = {
+             'نڤێسینا مفایێن بابەتان': `<div class="input-group"><label for="source">ژێدەر (پەرتووک، وانە)</label><input type="text" id="source" required></div><div class="input-group"><label for="details">مفایێن هاتینە نڤێسین</label><textarea id="details" required></textarea></div>${fileInputHTML}`,
+             'پوختەکرنا بابەتا وپەرتوکان': `<div class="input-group"><label for="book-title">ناڤێ پەرتووکێ/بابەتێ</label><input type="text" id="book-title" required></div><div class="input-group"><label for="author">نڤیسەر</label><input type="text" id="author"></div>${fileInputHTML}`,
+             'تفریغ،نڤێسینا شروڤەکرنا مامۆستایان': `<div class="input-group"><label for="teacher-name">ناڤێ مامۆستای</label><input type="text" id="teacher-name" required></div><div class="input-group"><label for="lesson-title">ناڤنیشانێ وانەیێ</label><input type="text" id="lesson-title" required></div>${fileInputHTML}`,
+             'چێکرنا نەخشێ هزری': `<div class="input-group"><label for="topic">بابەت</label><input type="text" id="topic" required></div><div class="input-group"><label for="activity-file">وێنێ نەخشێ هزری بلندکە</label><input type="file" id="activity-file" accept="image/*" required></div>`,
+             'نڤێسینا ڕاپورتان ودارشتن ومەقالان': `<div class="input-group"><label for="report-title">ناڤنیشان</label><input type="text" id="report-title" required></div>${fileInputHTML}`,
+             'نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ': `<div class="input-group"><label for="surah">سورة</label><input type="text" id="surah" required></div><div class="input-group"><label for="words-details">پەیڤ و ڕامان</label><textarea id="words-details" required></textarea></div>${fileInputHTML}`,
+             'گوتنا بابەتان یان وانەکێ': `<div class="input-group"><label for="talk-topic">بابەت</label><input type="text" id="talk-topic" required></div><div class="input-group"><label for="location">جهـ</label><input type="text" id="location"></div>${fileInputHTML}`,
+             'وەرگێڕانا پەرتوکان': `<div class="input-group"><label for="original-title">ناڤێ پەرتووکێ</label><input type="text" id="original-title" required></div><div class="input-group"><label for="original-author">نڤیسەر</label><input type="text" id="original-author"></div>${fileInputHTML}`,
+             'مڕاجعە ودووبارەکرنا بابەتان': `<div class="input-group"><label for="review-topic">بابەتێ هاتیە دووبارەکرن</label><input type="text" id="review-topic" required></div><div class="input-group"><label for="partners">ناڤێن هەڤالێن پشکدار</label><input type="text" id="partners"></div>${fileInputHTML}`,
+             'بەریکانێن زانستی وژبەرکرنا مەتنان': `<div class="input-group"><label for="competition-name">ناڤێ بەریکانێ</label><input type="text" id="competition-name" required></div><div class="input-group"><label for="rank">پلە</label><input type="text" id="rank"></div>${fileInputHTML}`,
+             'کاروچاڵاکیێن ژدەرڤە': `<div class="input-group"><label for="external-type">جورێ چالاکیێ (دەرس، وتار...)</label><input type="text" id="external-type" required></div><div class="input-group"><label for="external-location">جهـ</label><input type="text" id="external-location"></div>${fileInputHTML}`,
+             'کارێن ئەلکترونی': `<div class="input-group"><label for="electronic-type">جورێ کاری (دیزاین، مۆنتاژ...)</label><input type="text" id="electronic-type" required></div><div class="input-group"><label for="work-link">لینکێ کاری</label><input type="url" id="work-link"></div>${fileInputHTML}`,
+             'دیارکرنا ژێدەرێن بابەتێ': `<div class="input-group"><label for="source-topic">بابەت</label><input type="text" id="source-topic" required></div><div class="input-group"><label for="sources-list">لیستا ژێدەران</label><textarea id="sources-list" required></textarea></div>${fileInputHTML}`,
+             'بوارێ ڕەوشتی وئادابا': `<div class="input-group"><label for="ethics-situation">بارودۆخ یان چالاکی</label><input type="text" id="ethics-situation" required></div><div class="input-group"><label for="ethics-details">چەوانیا گرنگیدان ب ڕەوشت و ئادابان</label><textarea id="ethics-details" required></textarea></div>${fileInputHTML}`
+        };
+
+        activityTypeSelect.addEventListener('change', (e) => dynamicFieldsContainer.innerHTML = activityFields[e.target.value] || '');
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        addActivityBtn.addEventListener('click', async () => {
+            const type = activityTypeSelect.value;
+            if (!type || !currentUser) {
+                showStatusMessage('activity-status', 'تکایە جورێ چالاکیێ هەلبژێرە.', true);
+                return;
+            }
+
+            const newActivity = {
+                userId: currentUser.uid,
+                type: type,
+                date: new Date().toISOString(),
+                status: 'pending', // *** NEW: Default status is pending
+                data: {},
+                fileDataURL: null,
+                fileName: null,
+            };
+
+            const inputs = dynamicFieldsContainer.querySelectorAll('input, textarea');
+            let isFormValid = true;
+            inputs.forEach(input => {
+                if (input.required && !input.value.trim()) isFormValid = false;
+                if (input.type !== 'file' && input.value) {
+                    const label = dynamicFieldsContainer.querySelector(`label[for='${input.id}']`);
+                    if (label) newActivity.data[label.textContent] = input.value;
+                }
+            });
+
+            if (!isFormValid) {
+                showStatusMessage('activity-status', 'تکایە هەمی خانەیێن پێدڤی پربکەرەوە.', true);
+                return;
+            }
+            
+            addActivityBtn.disabled = true;
+            addActivityBtn.textContent = 'ل هیڤیێ بە...';
+
+            const fileInput = document.getElementById('activity-file');
+            if (fileInput && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                
+                if (file.size > 2 * 1024 * 1024) { // 2 MB limit
+                    showStatusMessage('activity-status', 'فایلێ بلندکری گەلەک مەزنە. تکایە فایلەکێ بچووکتر ژ 2MB بلندکە.', true);
+                    addActivityBtn.disabled = false;
+                    addActivityBtn.textContent = 'هنارتن بۆ پەسەندکرنێ';
+                    return;
+                }
+
+                try {
+                    newActivity.fileDataURL = await fileToBase64(file);
+                    newActivity.fileName = file.name;
+                } catch (error) {
+                    showStatusMessage('activity-status', `شاشی د خواندنا فایلێ دا: ${error.message}`, true);
+                    addActivityBtn.disabled = false;
+                    addActivityBtn.textContent = 'هنارتن بۆ پەسەندکرنێ';
+                    return;
+                }
+            }
+
+            try {
+                await db.collection('activities').add(newActivity);
+                showStatusMessage('activity-status', 'چالاکی ب سەرکەفتیانە هاتە هنارتن و ل هیڤیا پەسەندکرنێ یە.');
+                activityTypeSelect.value = '';
+                dynamicFieldsContainer.innerHTML = '';
+            } catch (error) {
+                showStatusMessage('activity-status', `شاشی د تۆمارکرنێ دا: ${error.message}`, true);
+            } finally {
+                addActivityBtn.disabled = false;
+                addActivityBtn.textContent = 'هنارتن بۆ پەسەندکرنێ';
+            }
+        });
+        
+        function setupActivitiesListener(userId) {
+            if (activitiesListener) activitiesListener();
+            
+            activitiesListener = db.collection('activities')
+                .where('userId', '==', userId)
+                .orderBy('date', 'desc')
+                .onSnapshot(snapshot => {
+                    const allActivities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    const approvedActivities = allActivities.filter(a => a.status === 'approved');
+                    const pendingActivities = allActivities.filter(a => a.status === 'pending' || a.status === 'rejected');
+                    
+                    renderActivities(approvedActivities, activitiesArchive);
+                    renderPendingActivities(pendingActivities, pendingContainer);
+                    updateUserPoints(userId, approvedActivities);
+
+                }, error => {
+                    console.error("Error fetching activities:", error);
+                    activitiesArchive.innerHTML = '<p style="color:var(--danger)">شاشیەک د ئینانا چالاکیان دا ڕوویدا.</p>';
+                    pendingContainer.innerHTML = '<p style="color:var(--danger)">شاشیەک د ئینانا چالاکیان دا ڕوویدا.</p>';
+                });
+        }
+        
+        async function updateUserPoints(userId, approvedActivities) {
+            const uniqueTypes = new Set(approvedActivities.map(act => act.type));
+            const points = uniqueTypes.size * 2; // Her jorekê çalakiya pesendkirî 2 xal in
+            totalPointsDisplay.textContent = points;
+            
+            try {
+                await db.collection('users').doc(userId).set({ points: points }, { merge: true });
+            } catch (error) {
+                console.error("Error updating points:", error);
+            }
+        }
+        
+        function renderActivities(activities, container) {
+            if (activities.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color: var(--text-muted);">هیچ چالاکیەکا پەسەندکری نەهاتیە تۆمارکرن.</p>';
+                return;
+            }
+            container.innerHTML = activities.map(activity => renderActivityCard(activity)).join('');
+        }
+        
+        function renderPendingActivities(activities, container) {
+            if (activities.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color: var(--text-muted);">هیچ چالاکیەک ل چاوەڕوانیێ نینە.</p>';
+                return;
+            }
+            container.innerHTML = activities.map(activity => renderActivityCard(activity)).join('');
+        }
+
+        function renderActivityCard(activity) {
+            const statusClasses = {
+                pending: 'status-pending',
+                approved: 'status-approved',
+                rejected: 'status-rejected'
+            };
+            const statusTexts = {
+                pending: 'چاوەڕوانە',
+                approved: 'پەسەندکری',
+                rejected: 'ڕەتکری'
+            };
+            const statusClass = statusClasses[activity.status] || '';
+            const statusText = statusTexts[activity.status] || activity.status;
+            
+            let detailsHtml = Object.entries(activity.data).map(([key, value]) => `<p><strong>${key}:</strong> <span>${value}</span></p>`).join('');
+            let attachmentHtml = '';
+
+            if (activity.fileDataURL) {
+                 const isImage = activity.fileName && /\.(jpe?g|png|gif|webp|bmp)$/i.test(activity.fileName);
+                 if (isImage) {
+                     attachmentHtml = `<div class="activity-attachment">
+                         <img src="${activity.fileDataURL}" alt="${activity.fileName || 'Wêneya çalakiyê'}" />
+                         <br>
+                         <a href="${activity.fileDataURL}" target="_blank" download="${activity.fileName || 'wene.jpg'}">داگرتنا وێنەی</a>
+                     </div>`;
+                 } else {
+                     attachmentHtml = `<div class="activity-attachment">
+                        <a href="${activity.fileDataURL}" target="_blank" download="${activity.fileName}">داگرتنا فایلێ (${activity.fileName})</a>
+                     </div>`;
+                 }
+            }
+            
+            return `
+                <div class="activity-card ${activity.status}">
+                    <div class="activity-card-header">
+                        <div>
+                            <div class="title">${activity.type.split(' ').slice(1).join(' ')}</div>
+                            <div class="date">${new Date(activity.date).toLocaleDateString('ku-IQ', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                        </div>
+                        <div>
+                            <span class="activity-status-badge ${statusClass}">${statusText}</span>
+                            ${(activity.status === 'pending' || activity.status === 'rejected') ? `<button class="remove-activity-btn" data-id="${activity.id}" title="ژێبرن">&times;</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="activity-card-details">
+                        ${detailsHtml}
+                        ${attachmentHtml}
+                    </div>
+                </div>`;
+        }
+        
+        // Event listener for both containers using event delegation
+        document.getElementById('app-container').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('remove-activity-btn')) {
+                const activityId = e.target.dataset.id;
+                if (confirm('تو یێ پشتراستی دێ ڤێ چالاکیێ ژێبەی؟ (ئەڤ کارە ناهێتە ڤەگەراندن)')) {
+                    try {
+                        await db.collection('activities').doc(activityId).delete();
+                        // The UI will update automatically because of the onSnapshot listener
+                    } catch (error) {
+                        console.error("Error removing activity:", error);
+                        alert("شاشیەک د ژێبرنا چالاکیێ دا ڕوویدا.");
+                    }
+                }
+            }
+        });
+
+        async function renderLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '<div class="loader">لیست دهێتە بارکرن...</div>';
+            
+            try {
+                // Ensure you have a composite index on 'points' (desc) in your Firebase 'users' collection.
+                const snapshot = await db.collection('users').orderBy('points', 'desc').limit(10).get();
+                if(snapshot.empty) {
+                    leaderboardList.innerHTML = '<p style="text-align:center; color: var(--text-muted);">هیچ بکارهێنەرەک نەهاتە دیتن.</p>';
+                    return;
+                }
+                let html = '';
+                let rank = 1;
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const defaultPic = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                    html += `
+                        <li class="leaderboard-item">
+                            <span class="leaderboard-rank">${rank++}</span>
+                            <img src="${user.profilePictureURL || defaultPic}" alt="Wêne" class="leaderboard-pic">
+                            <span class="leaderboard-name">${user.fullName || 'بێ ناڤ'}</span>
+                            <span class="leaderboard-points">${user.points || 0} خال</span>
+                        </li>`;
+                });
+                leaderboardList.innerHTML = html;
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+                leaderboardList.innerHTML = '<p style="color:var(--danger); text-align: center;">شاشیەک د ئینانا لیستێ دا ڕوویدا.<br><strong>تکایە پشتراست بە کو تە "Index" ب دروستی داناینە د Firebase دا.</strong></p>';
+            }
+        }
+    });
+    </script>
+</body>
+</html>
