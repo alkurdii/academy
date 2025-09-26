@@ -99,6 +99,35 @@
         .status-message.error { background-color: var(--danger); color: white; }
         .app-footer { text-align: center; padding: 20px; margin-top: 40px; color: var(--text-muted); font-size: 0.9rem; }
         .app-footer a { color: var(--accent-gold); text-decoration: none; }
+        /* *** STYLÊN NU JI BO PERRÊ SEREKI *** */
+        .feed-activity-card {
+            background-color: var(--primary-dark);
+            border: 1px solid var(--secondary-dark);
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .feed-user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--secondary-dark);
+        }
+        .feed-user-pic {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 15px;
+            border: 2px solid var(--accent-gold);
+        }
+        .feed-user-name {
+            font-weight: bold;
+            color: var(--text-light);
+        }
+        .feed-activity-content {
+            padding: 20px;
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @media (max-width: 992px) {
             .sidebar { transform: translateX(120px); z-index: 2000; }
@@ -126,13 +155,13 @@
                     <input type="password" id="login-password" required>
                 </div>
                 <button type="submit" class="btn btn-gold btn-block">چونا ژۆرڤە</button>
-          <p style="text-align: center; margin-top: 15px;">
-    ئەگەر تە هژمار نەبیتن پەیوەندیێ ب فێ ژمارێ بکە لسەر واتسئاپی
-    <br>
-    <a href="https://wa.me/9647517959116" target="_blank" style="color: var(--accent-gold); text-decoration: underline; cursor: pointer;">
-        ٠٧٥١ ٧٩٥ ٩١١٦
-    </a>
-</p>
+                <p style="text-align: center; margin-top: 15px;">
+‎                    ئەگەر تە هژمار نەبیتن پەیوەندیێ ب فێ ژمارێ بکە لسەر واتسئاپی
+                    <br>
+                    <a href="https://wa.me/9647517959116" target="_blank" style="color: var(--accent-gold); text-decoration: underline; cursor: pointer;">
+                        ٠٧٥١ ٧٩٥ ٩١١٦
+                    </a>
+                </p>
             </form>
 
             <!-- Signup Form (Hidden) -->
@@ -162,7 +191,9 @@
             <div class="sidebar-header"><h1>رێبوارێ زانینێ</h1></div>
             <nav>
                 <ul>
-                    <li><a href="#" class="nav-link active" data-page="activities-page" title="چالاکیێن زانستی">📝</a></li>
+                    <!-- *** LINK-A NU JI BO PERRÊ SEREKI *** -->
+                    <li><a href="#" class="nav-link active" data-page="main-feed-page" title="پەڕێ سەرەکی">🏠</a></li>
+                    <li><a href="#" class="nav-link" data-page="activities-page" title="چالاکیێن من">📝</a></li>
                     <li><a href="#" class="nav-link" data-page="leaderboard-page" title="پێشبرکێ">🏆</a></li>
                     <li><a href="#" class="nav-link" data-page="profile-page" title="پروفایل">👤</a></li>
                 </ul>
@@ -174,6 +205,11 @@
                 <button class="menu-toggle" id="menu-toggle-btn">☰</button>
                 <span id="page-title-text"></span>
             </h2>
+
+            <!-- *** PERRÊ SEREKI YÊ NU *** -->
+            <div id="main-feed-page" class="page">
+                <div id="main-feed-container"><div class="loader">چالاکیێن گشتی دهێنە بارکرن...</div></div>
+            </div>
 
             <!-- Activities Page -->
             <div id="activities-page" class="page">
@@ -264,7 +300,7 @@
 
             <footer class="app-footer">
                 <p>ئەڤ بەرهەمە ژ لایێ پرۆژێ ئیسلام ڤە هاتیە دروستکرن</p>
-                <a href="https://t.me/your_telegram_channel" target="_blank">کەناڵێ مە ل تێلێگرامی</a>
+                <a href="https://t.me/proje_islam" target="_blank">کەناڵێ مە ل تێلێگرامی</a>
             </footer>
         </main>
     </div>
@@ -279,11 +315,11 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyAs8Oj5Lxgi8R6qt3ZGkZqG9_9phqemQos",
-  authDomain: "kurdish-c8391.firebaseapp.com",
-  projectId: "kurdish-c8391",
-  storageBucket: "kurdish-c8391.firebasestorage.app",
-  messagingSenderId: "349871473333",
-  appId: "1:349871473333:web:6c9cbf5ec692c20000b4fc"
+            authDomain: "kurdish-c8391.firebaseapp.com",
+            projectId: "kurdish-c8391",
+            storageBucket: "kurdish-c8391.firebasestorage.app",
+            messagingSenderId: "349871473333",
+            appId: "1:349871473333:web:6c9cbf5ec692c20000b4fc"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -387,11 +423,12 @@
                     showPage('profile-page');
                     showStatusMessage('profile-status', 'تکایە زانیاریێن پرۆفایلێ خۆ تەمام بکە، ب تایبەت ژمارا موبایلێ.', false);
                 } else {
-                    showPage('activities-page');
+                    // *** LI DESTPÊKÊ PERRÊ SEREKI NÎSHAN BIDE ***
+                    showPage('main-feed-page');
                 }
             }).catch(err => {
                 console.error("Error checking user profile:", err);
-                showPage('activities-page');
+                showPage('main-feed-page');
             });
         }
 
@@ -421,6 +458,10 @@
             
             if (pageId === 'leaderboard-page') {
                 renderLeaderboard();
+            }
+            // *** DEMA PERRÊ SEREKI VEBE, FUNKSIONA WÊ BANG BIKE ***
+            if (pageId === 'main-feed-page') {
+                renderMainFeed();
             }
         }
         
@@ -503,20 +544,20 @@
         
         const fileInputHTML = `<div class="input-group"><label for="activity-file">بلندکرنا فایلەکێ (وێنە، PDF...)</label><input type="file" id="activity-file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx"></div>`;
         const activityFields = {
-             'نڤێسینا مفایێن بابەتان': `<div class="input-group"><label for="source">ژێدەر (پەرتووک، وانە)</label><input type="text" id="source" required></div><div class="input-group"><label for="details">مفایێن هاتینە نڤێسین</label><textarea id="details" required></textarea></div>${fileInputHTML}`,
-             'پوختەکرنا بابەتا وپەرتوکان': `<div class="input-group"><label for="book-title">ناڤێ پەرتووکێ/بابەتێ</label><input type="text" id="book-title" required></div><div class="input-group"><label for="author">نڤیسەر</label><input type="text" id="author"></div>${fileInputHTML}`,
-             'تفریغ،نڤێسینا شروڤەکرنا مامۆستایان': `<div class="input-group"><label for="teacher-name">ناڤێ مامۆستای</label><input type="text" id="teacher-name" required></div><div class="input-group"><label for="lesson-title">ناڤنیشانێ وانەیێ</label><input type="text" id="lesson-title" required></div>${fileInputHTML}`,
-             'چێکرنا نەخشێ هزری': `<div class="input-group"><label for="topic">بابەت</label><input type="text" id="topic" required></div><div class="input-group"><label for="activity-file">وێنێ نەخشێ هزری بلندکە</label><input type="file" id="activity-file" accept="image/*" required></div>`,
-             'نڤێسینا ڕاپورتان ودارشتن ومەقالان': `<div class="input-group"><label for="report-title">ناڤنیشان</label><input type="text" id="report-title" required></div>${fileInputHTML}`,
-             'نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ': `<div class="input-group"><label for="surah">سورة</label><input type="text" id="surah" required></div><div class="input-group"><label for="words-details">پەیڤ و ڕامان</label><textarea id="words-details" required></textarea></div>${fileInputHTML}`,
-             'گوتنا بابەتان یان وانەکێ': `<div class="input-group"><label for="talk-topic">بابەت</label><input type="text" id="talk-topic" required></div><div class="input-group"><label for="location">جهـ</label><input type="text" id="location"></div>${fileInputHTML}`,
-             'وەرگێڕانا پەرتوکان': `<div class="input-group"><label for="original-title">ناڤێ پەرتووکێ</label><input type="text" id="original-title" required></div><div class="input-group"><label for="original-author">نڤیسەر</label><input type="text" id="original-author"></div>${fileInputHTML}`,
-             'مڕاجعە ودووبارەکرنا بابەتان': `<div class="input-group"><label for="review-topic">بابەتێ هاتیە دووبارەکرن</label><input type="text" id="review-topic" required></div><div class="input-group"><label for="partners">ناڤێن هەڤالێن پشکدار</label><input type="text" id="partners"></div>${fileInputHTML}`,
-             'بەریکانێن زانستی وژبەرکرنا مەتنان': `<div class="input-group"><label for="competition-name">ناڤێ بەریکانێ</label><input type="text" id="competition-name" required></div><div class="input-group"><label for="rank">پلە</label><input type="text" id="rank"></div>${fileInputHTML}`,
-             'کاروچاڵاکیێن ژدەرڤە': `<div class="input-group"><label for="external-type">جورێ چالاکیێ (دەرس، وتار...)</label><input type="text" id="external-type" required></div><div class="input-group"><label for="external-location">جهـ</label><input type="text" id="external-location"></div>${fileInputHTML}`,
-             'کارێن ئەلکترونی': `<div class="input-group"><label for="electronic-type">جورێ کاری (دیزاین، مۆنتاژ...)</label><input type="text" id="electronic-type" required></div><div class="input-group"><label for="work-link">لینکێ کاری</label><input type="url" id="work-link"></div>${fileInputHTML}`,
-             'دیارکرنا ژێدەرێن بابەتێ': `<div class="input-group"><label for="source-topic">بابەت</label><input type="text" id="source-topic" required></div><div class="input-group"><label for="sources-list">لیستا ژێدەران</label><textarea id="sources-list" required></textarea></div>${fileInputHTML}`,
-             'بوارێ ڕەوشتی وئادابا': `<div class="input-group"><label for="ethics-situation">بارودۆخ یان چالاکی</label><input type="text" id="ethics-situation" required></div><div class="input-group"><label for="ethics-details">چەوانیا گرنگیدان ب ڕەوشت و ئادابان</label><textarea id="ethics-details" required></textarea></div>${fileInputHTML}`
+‎             'نڤێسینا مفایێن بابەتان': `<div class="input-group"><label for="source">ژێدەر (پەرتووک، وانە)</label><input type="text" id="source" required></div><div class="input-group"><label for="details">مفایێن هاتینە نڤێسین</label><textarea id="details" required></textarea></div>${fileInputHTML}`,
+‎             'پوختەکرنا بابەتا وپەرتوکان': `<div class="input-group"><label for="book-title">ناڤێ پەرتووکێ/بابەتێ</label><input type="text" id="book-title" required></div><div class="input-group"><label for="author">نڤیسەر</label><input type="text" id="author"></div>${fileInputHTML}`,
+‎             'تفریغ،نڤێسینا شروڤەکرنا مامۆستایان': `<div class="input-group"><label for="teacher-name">ناڤێ مامۆستای</label><input type="text" id="teacher-name" required></div><div class="input-group"><label for="lesson-title">ناڤنیشانێ وانەیێ</label><input type="text" id="lesson-title" required></div>${fileInputHTML}`,
+‎             'چێکرنا نەخشێ هزری': `<div class="input-group"><label for="topic">بابەت</label><input type="text" id="topic" required></div><div class="input-group"><label for="activity-file">وێنێ نەخشێ هزری بلندکە</label><input type="file" id="activity-file" accept="image/*" required></div>`,
+‎             'نڤێسینا ڕاپورتان ودارشتن ومەقالان': `<div class="input-group"><label for="report-title">ناڤنیشان</label><input type="text" id="report-title" required></div>${fileInputHTML}`,
+‎             'نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ': `<div class="input-group"><label for="surah">سورة</label><input type="text" id="surah" required></div><div class="input-group"><label for="words-details">پەیڤ و ڕامان</label><textarea id="words-details" required></textarea></div>${fileInputHTML}`,
+‎             'گوتنا بابەتان یان وانەکێ': `<div class="input-group"><label for="talk-topic">بابەت</label><input type="text" id="talk-topic" required></div><div class="input-group"><label for="location">جهـ</label><input type="text" id="location"></div>${fileInputHTML}`,
+‎             'وەرگێڕانا پەرتوکان': `<div class="input-group"><label for="original-title">ناڤێ پەرتووکێ</label><input type="text" id="original-title" required></div><div class="input-group"><label for="original-author">نڤیسەر</label><input type="text" id="original-author"></div>${fileInputHTML}`,
+‎             'مڕاجعە ودووبارەکرنا بابەتان': `<div class="input-group"><label for="review-topic">بابەتێ هاتیە دووبارەکرن</label><input type="text" id="review-topic" required></div><div class="input-group"><label for="partners">ناڤێن هەڤالێن پشکدار</label><input type="text" id="partners"></div>${fileInputHTML}`,
+‎             'بەریکانێن زانستی وژبەرکرنا مەتنان': `<div class="input-group"><label for="competition-name">ناڤێ بەریکانێ</label><input type="text" id="competition-name" required></div><div class="input-group"><label for="rank">پلە</label><input type="text" id="rank"></div>${fileInputHTML}`,
+‎             'کاروچاڵاکیێن ژدەرڤە': `<div class="input-group"><label for="external-type">جورێ چالاکیێ (دەرس، وتار...)</label><input type="text" id="external-type" required></div><div class="input-group"><label for="external-location">جهـ</label><input type="text" id="external-location"></div>${fileInputHTML}`,
+‎             'کارێن ئەلکترونی': `<div class="input-group"><label for="electronic-type">جورێ کاری (دیزاین، مۆنتاژ...)</label><input type="text" id="electronic-type" required></div><div class="input-group"><label for="work-link">لینکێ کاری</label><input type="url" id="work-link"></div>${fileInputHTML}`,
+‎             'دیارکرنا ژێدەرێن بابەتێ': `<div class="input-group"><label for="source-topic">بابەت</label><input type="text" id="source-topic" required></div><div class="input-group"><label for="sources-list">لیستا ژێدەران</label><textarea id="sources-list" required></textarea></div>${fileInputHTML}`,
+‎             'بوارێ ڕەوشتی وئادابا': `<div class="input-group"><label for="ethics-situation">بارودۆخ یان چالاکی</label><input type="text" id="ethics-situation" required></div><div class="input-group"><label for="ethics-details">چەوانیا گرنگیدان ب ڕەوشت و ئادابان</label><textarea id="ethics-details" required></textarea></div>${fileInputHTML}`
         };
 
         activityTypeSelect.addEventListener('change', (e) => dynamicFieldsContainer.innerHTML = activityFields[e.target.value] || '');
@@ -541,7 +582,7 @@
                 userId: currentUser.uid,
                 type: type,
                 date: new Date().toISOString(),
-                status: 'pending', // *** NEW: Default status is pending
+                status: 'pending', 
                 data: {},
                 fileDataURL: null,
                 fileName: null,
@@ -702,14 +743,12 @@
                 </div>`;
         }
         
-        // Event listener for both containers using event delegation
         document.getElementById('app-container').addEventListener('click', async (e) => {
             if (e.target.classList.contains('remove-activity-btn')) {
                 const activityId = e.target.dataset.id;
                 if (confirm('تو یێ پشتراستی دێ ڤێ چالاکیێ ژێبەی؟ (ئەڤ کارە ناهێتە ڤەگەراندن)')) {
                     try {
                         await db.collection('activities').doc(activityId).delete();
-                        // The UI will update automatically because of the onSnapshot listener
                     } catch (error) {
                         console.error("Error removing activity:", error);
                         alert("شاشیەک د ژێبرنا چالاکیێ دا ڕوویدا.");
@@ -723,7 +762,6 @@
             leaderboardList.innerHTML = '<div class="loader">لیست دهێتە بارکرن...</div>';
             
             try {
-                // Ensure you have a composite index on 'points' (desc) in your Firebase 'users' collection.
                 const snapshot = await db.collection('users').orderBy('points', 'desc').limit(10).get();
                 if(snapshot.empty) {
                     leaderboardList.innerHTML = '<p style="text-align:center; color: var(--text-muted);">هیچ بکارهێنەرەک نەهاتە دیتن.</p>';
@@ -745,9 +783,90 @@
                 leaderboardList.innerHTML = html;
             } catch (error) {
                 console.error("Error fetching leaderboard:", error);
-                leaderboardList.innerHTML = '<p style="color:var(--danger); text-align: center;">شاشیەک د ئینانا لیستێ دا ڕوویدا.<br><strong>تکایە پشتراست بە کو تە "Index" ب دروستی داناینە د Firebase دا.</strong></p>';
+                leaderboardList.innerHTML = '<p style="color:var(--danger); text-align: center;">شاشیەک د ئینانا لیستێ دا ڕوویدا.</p>';
             }
         }
+        
+        // *** FUNKSIONA NU JI BO NÎSHANDANA ÇALAKIYÊN HEMI QUTABIYAN ***
+        async function renderMainFeed() {
+            const feedContainer = document.getElementById('main-feed-container');
+            feedContainer.innerHTML = '<div class="loader">چالاکیێن گشتی دهێنە بارکرن...</div>';
+
+            try {
+                const activitiesSnapshot = await db.collection('activities')
+                    .where('status', '==', 'approved')
+                    .orderBy('date', 'desc')
+                    .limit(30) // Tênê 30 چالاکیێن nûtir nîshan bide
+                    .get();
+
+                if (activitiesSnapshot.empty) {
+                    feedContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted);">هیچ چالاکیەکا پەسەندکری یا گشتی نینە کو بهێتە نیشاندان.</p>';
+                    return;
+                }
+
+                // Komkirina ID-yên bikarhêneran daku carekê datayên wan bên wergirtin
+                const userIds = [...new Set(activitiesSnapshot.docs.map(doc => doc.data().userId))];
+                const usersData = {};
+                
+                // Wergirtina datayên bikarhêneran
+                for (const userId of userIds) {
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    if (userDoc.exists) {
+                        usersData[userId] = userDoc.data();
+                    }
+                }
+
+                let html = '';
+                activitiesSnapshot.forEach(doc => {
+                    const activity = { id: doc.id, ...doc.data() };
+                    const user = usersData[activity.userId];
+                    if (user) {
+                        html += renderFeedActivityCard(activity, user);
+                    }
+                });
+
+                feedContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Error fetching main feed:", error);
+                feedContainer.innerHTML = '<p style="color:var(--danger); text-align: center;">شاشیەک د ئینانا چالاکیێن گشتی دا ڕوویدا.</p>';
+            }
+        }
+
+        // *** FUNKSIONA NU JI BO DRUSTKIRINA KARTÊN ÇALAKIYAN LI PERRÊ SEREKI ***
+        function renderFeedActivityCard(activity, user) {
+            const defaultPic = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            let detailsHtml = Object.entries(activity.data).map(([key, value]) => `<p><strong>${key}:</strong> <span>${value}</span></p>`).join('');
+            let attachmentHtml = '';
+
+            if (activity.fileDataURL) {
+                 const isImage = activity.fileName && /\.(jpe?g|png|gif|webp|bmp)$/i.test(activity.fileName);
+                 if (isImage) {
+                     attachmentHtml = `<div class="activity-attachment"><img src="${activity.fileDataURL}" alt="${activity.fileName || 'Wêneya çalakiyê'}" /></div>`;
+                 } else {
+                     attachmentHtml = `<div class="activity-attachment"><a href="${activity.fileDataURL}" target="_blank" download="${activity.fileName}">داگرتنا فایلێ (${activity.fileName})</a></div>`;
+                 }
+            }
+
+            return `
+                <div class="feed-activity-card">
+                    <div class="feed-user-info">
+                        <img src="${user.profilePictureURL || defaultPic}" alt="Wêne" class="feed-user-pic">
+                        <div>
+                            <div class="feed-user-name">${user.fullName || 'بێ ناڤ'}</div>
+                            <div class="date">${new Date(activity.date).toLocaleDateString('ku-IQ', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                        </div>
+                    </div>
+                    <div class="feed-activity-content">
+                        <h4 class="card-title" style="font-size: 1.4rem;">${activity.type}</h4>
+                        <div class="activity-card-details">
+                            ${detailsHtml}
+                            ${attachmentHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
     });
     </script>
 </body>
