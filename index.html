@@ -156,7 +156,7 @@
                 </div>
                 <button type="submit" class="btn btn-gold btn-block">چونا ژۆرڤە</button>
                 <p style="text-align: center; margin-top: 15px;">
-‎                    ئەگەر تە هژمار نەبیتن پەیوەندیێ ب فێ ژمارێ بکە لسەر واتسئاپی
+                    ئەگەر تە هژمار نەبیتن پەیوەندیێ ب فێ ژمارێ بکە لسەر واتسئاپی
                     <br>
                     <a href="https://wa.me/9647517959116" target="_blank" style="color: var(--accent-gold); text-decoration: underline; cursor: pointer;">
                         ٠٧٥١ ٧٩٥ ٩١١٦
@@ -187,13 +187,15 @@
     </div>
 
     <div id="app-container">
-        <aside class="sidebar">
+               <aside class="sidebar">
             <div class="sidebar-header"><h1>رێبوارێ زانینێ</h1></div>
             <nav>
                 <ul>
-                    <!-- *** LINK-A NU JI BO PERRÊ SEREKI *** -->
+                    <!-- ===================== LI VIR ZÊDE BIKE ===================== -->
                     <li><a href="#" class="nav-link active" data-page="main-feed-page" title="پەڕێ سەرەکی">🏠</a></li>
-                    <li><a href="#" class="nav-link" data-page="activities-page" title="چالاکیێن من">📝</a></li>
+                    <!-- ========================================================== -->
+
+                    <li><a href="#" class="nav-link" data-page="activities-page" title="چالاکیێن من">📝</a></li> <!-- TÊBINI: Klassa 'active' ژ ڤێرێ هاتە راکرن -->
                     <li><a href="#" class="nav-link" data-page="leaderboard-page" title="پێشبرکێ">🏆</a></li>
                     <li><a href="#" class="nav-link" data-page="profile-page" title="پروفایل">👤</a></li>
                 </ul>
@@ -544,20 +546,20 @@
         
         const fileInputHTML = `<div class="input-group"><label for="activity-file">بلندکرنا فایلەکێ (وێنە، PDF...)</label><input type="file" id="activity-file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx"></div>`;
         const activityFields = {
-‎             'نڤێسینا مفایێن بابەتان': `<div class="input-group"><label for="source">ژێدەر (پەرتووک، وانە)</label><input type="text" id="source" required></div><div class="input-group"><label for="details">مفایێن هاتینە نڤێسین</label><textarea id="details" required></textarea></div>${fileInputHTML}`,
-‎             'پوختەکرنا بابەتا وپەرتوکان': `<div class="input-group"><label for="book-title">ناڤێ پەرتووکێ/بابەتێ</label><input type="text" id="book-title" required></div><div class="input-group"><label for="author">نڤیسەر</label><input type="text" id="author"></div>${fileInputHTML}`,
-‎             'تفریغ،نڤێسینا شروڤەکرنا مامۆستایان': `<div class="input-group"><label for="teacher-name">ناڤێ مامۆستای</label><input type="text" id="teacher-name" required></div><div class="input-group"><label for="lesson-title">ناڤنیشانێ وانەیێ</label><input type="text" id="lesson-title" required></div>${fileInputHTML}`,
-‎             'چێکرنا نەخشێ هزری': `<div class="input-group"><label for="topic">بابەت</label><input type="text" id="topic" required></div><div class="input-group"><label for="activity-file">وێنێ نەخشێ هزری بلندکە</label><input type="file" id="activity-file" accept="image/*" required></div>`,
-‎             'نڤێسینا ڕاپورتان ودارشتن ومەقالان': `<div class="input-group"><label for="report-title">ناڤنیشان</label><input type="text" id="report-title" required></div>${fileInputHTML}`,
-‎             'نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ': `<div class="input-group"><label for="surah">سورة</label><input type="text" id="surah" required></div><div class="input-group"><label for="words-details">پەیڤ و ڕامان</label><textarea id="words-details" required></textarea></div>${fileInputHTML}`,
-‎             'گوتنا بابەتان یان وانەکێ': `<div class="input-group"><label for="talk-topic">بابەت</label><input type="text" id="talk-topic" required></div><div class="input-group"><label for="location">جهـ</label><input type="text" id="location"></div>${fileInputHTML}`,
-‎             'وەرگێڕانا پەرتوکان': `<div class="input-group"><label for="original-title">ناڤێ پەرتووکێ</label><input type="text" id="original-title" required></div><div class="input-group"><label for="original-author">نڤیسەر</label><input type="text" id="original-author"></div>${fileInputHTML}`,
-‎             'مڕاجعە ودووبارەکرنا بابەتان': `<div class="input-group"><label for="review-topic">بابەتێ هاتیە دووبارەکرن</label><input type="text" id="review-topic" required></div><div class="input-group"><label for="partners">ناڤێن هەڤالێن پشکدار</label><input type="text" id="partners"></div>${fileInputHTML}`,
-‎             'بەریکانێن زانستی وژبەرکرنا مەتنان': `<div class="input-group"><label for="competition-name">ناڤێ بەریکانێ</label><input type="text" id="competition-name" required></div><div class="input-group"><label for="rank">پلە</label><input type="text" id="rank"></div>${fileInputHTML}`,
-‎             'کاروچاڵاکیێن ژدەرڤە': `<div class="input-group"><label for="external-type">جورێ چالاکیێ (دەرس، وتار...)</label><input type="text" id="external-type" required></div><div class="input-group"><label for="external-location">جهـ</label><input type="text" id="external-location"></div>${fileInputHTML}`,
-‎             'کارێن ئەلکترونی': `<div class="input-group"><label for="electronic-type">جورێ کاری (دیزاین، مۆنتاژ...)</label><input type="text" id="electronic-type" required></div><div class="input-group"><label for="work-link">لینکێ کاری</label><input type="url" id="work-link"></div>${fileInputHTML}`,
-‎             'دیارکرنا ژێدەرێن بابەتێ': `<div class="input-group"><label for="source-topic">بابەت</label><input type="text" id="source-topic" required></div><div class="input-group"><label for="sources-list">لیستا ژێدەران</label><textarea id="sources-list" required></textarea></div>${fileInputHTML}`,
-‎             'بوارێ ڕەوشتی وئادابا': `<div class="input-group"><label for="ethics-situation">بارودۆخ یان چالاکی</label><input type="text" id="ethics-situation" required></div><div class="input-group"><label for="ethics-details">چەوانیا گرنگیدان ب ڕەوشت و ئادابان</label><textarea id="ethics-details" required></textarea></div>${fileInputHTML}`
+             'نڤێسینا مفایێن بابەتان': `<div class="input-group"><label for="source">ژێدەر (پەرتووک، وانە)</label><input type="text" id="source" required></div><div class="input-group"><label for="details">مفایێن هاتینە نڤێسین</label><textarea id="details" required></textarea></div>${fileInputHTML}`,
+             'پوختەکرنا بابەتا وپەرتوکان': `<div class="input-group"><label for="book-title">ناڤێ پەرتووکێ/بابەتێ</label><input type="text" id="book-title" required></div><div class="input-group"><label for="author">نڤیسەر</label><input type="text" id="author"></div>${fileInputHTML}`,
+             'تفریغ،نڤێسینا شروڤەکرنا مامۆستایان': `<div class="input-group"><label for="teacher-name">ناڤێ مامۆستای</label><input type="text" id="teacher-name" required></div><div class="input-group"><label for="lesson-title">ناڤنیشانێ وانەیێ</label><input type="text" id="lesson-title" required></div>${fileInputHTML}`,
+             'چێکرنا نەخشێ هزری': `<div class="input-group"><label for="topic">بابەت</label><input type="text" id="topic" required></div><div class="input-group"><label for="activity-file">وێنێ نەخشێ هزری بلندکە</label><input type="file" id="activity-file" accept="image/*" required></div>`,
+             'نڤێسینا ڕاپورتان ودارشتن ومەقالان': `<div class="input-group"><label for="report-title">ناڤنیشان</label><input type="text" id="report-title" required></div>${fileInputHTML}`,
+             'نڤێسینا پەیڤ وڕامانا پەیڤێن قۆڕئانێ': `<div class="input-group"><label for="surah">سورة</label><input type="text" id="surah" required></div><div class="input-group"><label for="words-details">پەیڤ و ڕامان</label><textarea id="words-details" required></textarea></div>${fileInputHTML}`,
+             'گوتنا بابەتان یان وانەکێ': `<div class="input-group"><label for="talk-topic">بابەت</label><input type="text" id="talk-topic" required></div><div class="input-group"><label for="location">جهـ</label><input type="text" id="location"></div>${fileInputHTML}`,
+             'وەرگێڕانا پەرتوکان': `<div class="input-group"><label for="original-title">ناڤێ پەرتووکێ</label><input type="text" id="original-title" required></div><div class="input-group"><label for="original-author">نڤیسەر</label><input type="text" id="original-author"></div>${fileInputHTML}`,
+             'مڕاجعە ودووبارەکرنا بابەتان': `<div class="input-group"><label for="review-topic">بابەتێ هاتیە دووبارەکرن</label><input type="text" id="review-topic" required></div><div class="input-group"><label for="partners">ناڤێن هەڤالێن پشکدار</label><input type="text" id="partners"></div>${fileInputHTML}`,
+             'بەریکانێن زانستی وژبەرکرنا مەتنان': `<div class="input-group"><label for="competition-name">ناڤێ بەریکانێ</label><input type="text" id="competition-name" required></div><div class="input-group"><label for="rank">پلە</label><input type="text" id="rank"></div>${fileInputHTML}`,
+             'کاروچاڵاکیێن ژدەرڤە': `<div class="input-group"><label for="external-type">جورێ چالاکیێ (دەرس، وتار...)</label><input type="text" id="external-type" required></div><div class="input-group"><label for="external-location">جهـ</label><input type="text" id="external-location"></div>${fileInputHTML}`,
+             'کارێن ئەلکترونی': `<div class="input-group"><label for="electronic-type">جورێ کاری (دیزاین، مۆنتاژ...)</label><input type="text" id="electronic-type" required></div><div class="input-group"><label for="work-link">لینکێ کاری</label><input type="url" id="work-link"></div>${fileInputHTML}`,
+             'دیارکرنا ژێدەرێن بابەتێ': `<div class="input-group"><label for="source-topic">بابەت</label><input type="text" id="source-topic" required></div><div class="input-group"><label for="sources-list">لیستا ژێدەران</label><textarea id="sources-list" required></textarea></div>${fileInputHTML}`,
+             'بوارێ ڕەوشتی وئادابا': `<div class="input-group"><label for="ethics-situation">بارودۆخ یان چالاکی</label><input type="text" id="ethics-situation" required></div><div class="input-group"><label for="ethics-details">چەوانیا گرنگیدان ب ڕەوشت و ئادابان</label><textarea id="ethics-details" required></textarea></div>${fileInputHTML}`
         };
 
         activityTypeSelect.addEventListener('change', (e) => dynamicFieldsContainer.innerHTML = activityFields[e.target.value] || '');
